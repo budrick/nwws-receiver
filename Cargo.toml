@@ -1,0 +1,17 @@
+[package]
+name = "nwws-retransmit"
+version = "0.1.0"
+authors = ["Matt Cegielka <matt@mudbrick.org>"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+nwws-oi = "0.2.0"
+log = "0.4"
+futures = "0.3"
+tokio = { version = "1.17", features = ["full"] }
+env_logger = "0.9"
+dotenv = "0.15.0"
+chrono = "0.4.19"
+sqlite = "0.26.0"
