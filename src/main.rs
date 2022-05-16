@@ -7,7 +7,8 @@ use nwws_oi::Config;
 use nwws_oi::Channel;
 use uuid;
 use chrono::{DateTime, Utc};
-use rusqlite::{named_params, Connection, Result};
+use rusqlite::{named_params, Connection};
+// use rusqlite::{named_params, Connection, Result};
 
 #[tokio::main]
 async fn main() {
@@ -40,6 +41,9 @@ async fn main() {
     let dbconn = Connection::open(path).unwrap();
     // We want to store the timestamp, type (ttaa) and full text of bulletins
     dbconn.execute("CREATE TABLE IF NOT EXISTS bulletins (time_rfc3339 text, type text, bulletin text)", []).unwrap();
+    dbconn.execute("CREATE INDEX IF NOT EXISTS time_idx ON bulletins (time_rfc3339)", []).unwrap();
+    dbconn.execute("CREATE INDEX IF NOT EXISTS type_ids ON bulletins (type)", []).unwrap();
+    dbconn.execute("CREATE INDEX IF NOT EXISTS time_type ON bulletins (time_rfc3339, type)", []).unwrap();
     let mut stmt = dbconn.prepare("INSERT INTO bulletins VALUES (:time, :type, :text)").unwrap();
     
     // Process messages when we get them.
