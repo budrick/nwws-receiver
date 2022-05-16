@@ -7,11 +7,18 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-nwws-oi = "0.2.0"
-log = "0.4"
-futures = "0.3"
-tokio = { version = "1.17", features = ["full"] }
-env_logger = "0.9"
+log = "0.4.14"
+futures = "0.3.21"
+tokio = { version = "1.17.0", features = ["full"] }
+env_logger = "0.9.0"
 dotenv = "0.15.0"
 chrono = "0.4.19"
-sqlite = "0.26.0"
+rusqlite = "0.27"
+nwws-oi = "0.2.0"
+uuid = { version = "0.8", features = ["v4"] }
+
+[patch.crates-io]
+nwws-oi = { path = "../nwws-oi" }
+tokio-xmpp = { path = "../xmpp-rs/tokio-xmpp" }
+
+[features]

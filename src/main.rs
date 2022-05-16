@@ -2,16 +2,12 @@ extern crate dotenv;
 use dotenv::dotenv;
 use futures::StreamExt;
 use nwws_oi::StreamEvent;
+use nwws_oi::Server;
+use nwws_oi::Config;
+use nwws_oi::Channel;
+use uuid;
 use chrono::{DateTime, Utc};
-// use sqlite;
-
-// fn get_pwd() -> std::path::PathBuf {
-//     let p = std::env::current_dir();
-//     match p {
-//         Ok(p) => p,
-//         Err(_e) => std::path::PathBuf::new()
-//     }
-// }
+use rusqlite::{named_params, Connection, Result};
 
 #[tokio::main]
 async fn main() {
@@ -26,13 +22,27 @@ async fn main() {
     path.push("bulletins");
     path.set_extension("sqlite");
 
-    println!("Path {}", path.display());
+    println!("Database path: {}", path.display());
 
     let username = std::env::var("NWWS_OI_USERNAME").expect("NWWS_OI_USERNAME must be set");
     let password = std::env::var("NWWS_OI_PASSWORD").expect("NWWS_OI_PASSWORD must be set");
 
-    let mut stream = nwws_oi::Stream::new((username, password));
-
+    let conf = Config {
+        username,
+        password,
+        server: Server::Primary,
+        resource: format!("uuid/{}", uuid::Uuid::new_v4()),
+        channel: Channel::Default
+    };
+    let mut stream = nwws_oi::Stream::new(conf);
+    
+    // Create an SQLite database, so that we might shove bulletins into it.
+    let dbconn = Connection::open(path).unwrap();
+    // We want to store the timestamp, type (ttaa) and full text of bulletins
+    dbconn.execute("CREATE TABLE IF NOT EXISTS bulletins (time_rfc3339 text, type text, bulletin text)", []).unwrap();
+    let mut stmt = dbconn.prepare("INSERT INTO bulletins VALUES (:time, :type, :text)").unwrap();
+    
+    // Process messages when we get them.
     while let Some(event) = stream.next().await {
         match event {
             StreamEvent::ConnectionState(_state) => {}
@@ -42,11 +52,22 @@ async fn main() {
                 let now: DateTime<Utc> = Utc::now();
                 match ttaa {
                     // Tornado warning
-                    "WFUS" => println!("{}: Tornado warning issued by {}", now.to_rfc3339(), message.cccc),
+                    "WFUS" => {
+                        println!("{}: Tornado warning issued by {}", now.to_rfc3339(), message.cccc);
+                        let _res = stmt.execute(named_params!{":time": now.to_rfc3339(), ":type": ttaa, ":text": message.message });
+                    },
                     // Severe thunderstorm warning
-                    "WUUS" => println!("{}: Severe thunderstorm warning issued by {}", now.to_rfc3339(), message.cccc),
+                    "WUUS" => {
+                        // Ignore SPC updates. Unsure why they have the same WMO ttaa as severe thunderstorm warnings.
+                        if message.cccc != "KWNS" {
+                            println!("{}: Severe thunderstorm warning issued by {}", now.to_rfc3339(), message.cccc);
+                            let _res = stmt.execute(named_params!{":time": now.to_rfc3339(), ":type": ttaa, ":text": message.message });
+                        }
+                    },
                     // Severe weather statement - may update/supercede WFUS or WUUS bulletins
-                    "WWUS" => (),
+                    "WWUS" => {
+                        let _res = stmt.execute(named_params!{":time": now.to_rfc3339(), ":type": ttaa, ":text": message.message });
+                    },
                     // Fall through
                     _ => ()
                 }
