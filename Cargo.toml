@@ -18,7 +18,7 @@ nwws-oi = "0.2.0"
 uuid = { version = "0.8", features = ["v4"] }
 
 [patch.crates-io]
-nwws-oi = { path = "../nwws-oi" }
-tokio-xmpp = { path = "../xmpp-rs/tokio-xmpp" }
+nwws-oi = { path = "./patched-crates/nwws-oi" }
+tokio-xmpp = { path = "./patched-crates/xmpp-rs/tokio-xmpp" }
 
 [features]
