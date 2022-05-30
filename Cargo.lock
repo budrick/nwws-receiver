@@ -715,7 +715,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "nwws-retransmit"
+name = "nwws-receiver"
 version = "0.1.0"
 dependencies = [
  "chrono",

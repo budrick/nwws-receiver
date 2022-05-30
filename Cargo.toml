@@ -1,5 +1,5 @@
 [package]
-name = "nwws-retransmit"
+name = "nwws-receiver"
 version = "0.1.0"
 authors = ["Matt Cegielka <matt@mudbrick.org>"]
 edition = "2021"
