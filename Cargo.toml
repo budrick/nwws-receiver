@@ -9,7 +9,7 @@ edition = "2021"
 [dependencies]
 log = "0.4.14"
 futures = "0.3.21"
-tokio = { version = "1.17.0", features = ["full"] }
+tokio = { version = "1", features = ["full"] }
 env_logger = "0.9.0"
 dotenv = "0.15.0"
 chrono = "0.4.19"
@@ -19,6 +19,5 @@ uuid = { version = "0.8", features = ["v4"] }
 
 [patch.crates-io]
 nwws-oi = { path = "./patched-crates/nwws-oi" }
-tokio-xmpp = { path = "./patched-crates/xmpp-rs/tokio-xmpp" }
 
 [features]

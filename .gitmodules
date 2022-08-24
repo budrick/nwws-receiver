@@ -1,6 +1,3 @@
-[submodule "patched-crates/xmpp-rs"]
-	path = patched-crates/xmpp-rs
-	url = https://gitlab.com/xmpp-rs/xmpp-rs.git
 [submodule "patched-crates/nwws-oi"]
 	path = patched-crates/nwws-oi
 	url = https://github.com/budrick/nwws-oi/
