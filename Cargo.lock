@@ -674,7 +674,9 @@ dependencies = [
 
 [[package]]
 name = "nwws-oi"
-version = "0.2.0"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "79c8ff0c868cf7cef66adbe83c34a60d31e14cb69199ba95629e1fc5fb5b6492"
 dependencies = [
  "chrono",
  "futures",

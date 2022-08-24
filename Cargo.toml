@@ -14,10 +14,10 @@ env_logger = "0.9.0"
 dotenv = "0.15.0"
 chrono = "0.4.19"
 rusqlite = "0.27"
-nwws-oi = "0.2.0"
+nwws-oi = "0.2"
 uuid = { version = "0.8", features = ["v4"] }
 
-[patch.crates-io]
-nwws-oi = { path = "./patched-crates/nwws-oi" }
+# [patch.crates-io]
+# nwws-oi = { path = "./patched-crates/nwws-oi" }
 
 [features]
