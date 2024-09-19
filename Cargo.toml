@@ -16,6 +16,7 @@ chrono = "0.4.19"
 rusqlite = "0.27"
 nwws-oi = "0.2.0"
 uuid = { version = "0.8", features = ["v4"] }
+anyhow = "1.0.66"
 
 [patch.crates-io]
 nwws-oi = { path = "./patched-crates/nwws-oi" }

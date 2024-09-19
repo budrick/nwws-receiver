@@ -8,10 +8,11 @@ use nwws_oi::Channel;
 use uuid;
 use chrono::{DateTime, Utc};
 use rusqlite::{named_params, Connection};
+use anyhow::Result;
 // use rusqlite::{named_params, Connection, Result};
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<()> {
     dotenv().ok();
     env_logger::builder()
         .filter(None, log::LevelFilter::Info)
@@ -19,7 +20,7 @@ async fn main() {
         .parse_default_env()
         .init();
 
-    let mut path = std::env::current_dir().unwrap();
+    let mut path = std::env::current_dir()?;
     path.push("bulletins");
     path.set_extension("sqlite");
 
@@ -38,13 +39,13 @@ async fn main() {
     let mut stream = nwws_oi::Stream::new(conf);
     
     // Create an SQLite database, so that we might shove bulletins into it.
-    let dbconn = Connection::open(path).unwrap();
+    let dbconn = Connection::open(path)?;
     // We want to store the timestamp, type (ttaa) and full text of bulletins
-    dbconn.execute("CREATE TABLE IF NOT EXISTS bulletins (time_rfc3339 text, type text, bulletin text)", []).unwrap();
-    dbconn.execute("CREATE INDEX IF NOT EXISTS time_idx ON bulletins (time_rfc3339)", []).unwrap();
-    dbconn.execute("CREATE INDEX IF NOT EXISTS type_ids ON bulletins (type)", []).unwrap();
-    dbconn.execute("CREATE INDEX IF NOT EXISTS time_type ON bulletins (time_rfc3339, type)", []).unwrap();
-    let mut stmt = dbconn.prepare("INSERT INTO bulletins VALUES (:time, :type, :text)").unwrap();
+    dbconn.execute("CREATE TABLE IF NOT EXISTS bulletins (time_rfc3339 text, type text, bulletin text)", [])?;
+    dbconn.execute("CREATE INDEX IF NOT EXISTS time_idx ON bulletins (time_rfc3339)", [])?;
+    dbconn.execute("CREATE INDEX IF NOT EXISTS type_ids ON bulletins (type)", [])?;
+    dbconn.execute("CREATE INDEX IF NOT EXISTS time_type ON bulletins (time_rfc3339, type)", [])?;
+    let mut stmt = dbconn.prepare("INSERT INTO bulletins VALUES (:time, :type, :text)")?;
     
     // Process messages when we get them.
     while let Some(event) = stream.next().await {
@@ -79,4 +80,5 @@ async fn main() {
             }
         }
     }
+    Ok(())
 }
