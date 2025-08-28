@@ -1,4 +1,3 @@
-extern crate dotenv;
 use chrono::{DateTime, Utc};
 use dotenv::dotenv;
 use futures::StreamExt;
