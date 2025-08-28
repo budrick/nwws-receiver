@@ -1,12 +1,8 @@
-[package]
-name = "nwws-receiver"
-version = "0.1.0"
-authors = ["Matt Cegielka <matt@mudbrick.org>"]
-edition = "2021"
+[workspace]
+members = ['crates/*']
+resolver = "2"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
+[workspace.dependencies]
 log = "0.4.14"
 futures = "0.3.21"
 tokio = { version = "1", features = ["full"] }
@@ -14,10 +10,6 @@ env_logger = "0.9.0"
 dotenv = "0.15.0"
 chrono = "0.4.19"
 rusqlite = "0.27"
+nom = "8.0.0"
 nwws-oi = "0.2"
 uuid = { version = "0.8", features = ["v4"] }
-
-# [patch.crates-io]
-# nwws-oi = { path = "./patched-crates/nwws-oi" }
-
-[features]
