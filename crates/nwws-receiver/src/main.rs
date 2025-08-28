@@ -7,8 +7,6 @@ use nwws_oi::Config;
 use nwws_oi::Server;
 use nwws_oi::StreamEvent;
 use rusqlite::{named_params, Connection};
-use uuid;
-// use rusqlite::{named_params, Connection, Result};
 
 #[tokio::main]
 async fn main() {
