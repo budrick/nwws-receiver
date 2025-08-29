@@ -1109,6 +1109,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "nws-product-list"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d78cd76968823d2253ff095041893fb979741b5b61a97f792c76dd0801e8b5b7"
+
+[[package]]
 name = "nwws-oi"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1135,6 +1141,7 @@ dependencies = [
  "env_logger",
  "futures",
  "log",
+ "nws-product-list",
  "nwws-oi",
  "rusqlite",
  "tokio",

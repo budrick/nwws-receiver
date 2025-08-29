@@ -17,6 +17,7 @@ chrono.workspace = true
 rusqlite.workspace = true
 nwws-oi.workspace = true
 uuid = { workspace = true }
+nws-product-list.workspace = true
 
 # [patch.crates-io]
 # nwws-oi = { path = "./patched-crates/nwws-oi" }

@@ -14,3 +14,4 @@ rusqlite = { version = "0.37", features = ["bundled"] }
 nom = "8.0.0"
 nwws-oi = "0.3"
 uuid = { version = "0.8", features = ["v4"] }
+nws-product-list = "0.1.0"
