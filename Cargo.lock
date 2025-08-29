@@ -1208,6 +1208,7 @@ dependencies = [
  "nws-product-list",
  "nwws-oi",
  "oasiscap",
+ "owo-colors",
  "rusqlite",
  "tokio",
  "uuid",

@@ -19,6 +19,7 @@ nwws-oi.workspace = true
 uuid = { workspace = true }
 nws-product-list.workspace = true
 oasiscap.workspace = true
+owo-colors.workspace = true
 
 # [patch.crates-io]
 # nwws-oi = { path = "./patched-crates/nwws-oi" }

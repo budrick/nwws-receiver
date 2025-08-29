@@ -1,7 +1,7 @@
+use nwws_receiver::termlog;
 use std::str::FromStr;
 
 use nwws_receiver::{config, nwwsoi};
-use oasiscap::v1dot2::Status;
 use tokio::signal;
 use tokio::sync::mpsc;
 
@@ -36,42 +36,11 @@ async fn printcap(mut receiver: mpsc::Receiver<nwws_oi::Message>) {
         if &msg.ttaaii[..1] == "X" {
             let x = extractxml(&msg.message);
             if let Ok(alert) = oasiscap::Alert::from_str(x) {
-                let latest = alert.into_latest();
-                if latest.status == Status::Actual {
-                    println!("Bulletin: {} sent by {}", latest.identifier, latest.sender);
-                    latest.info.iter().enumerate().for_each(|(i, info)| {
-                        println!(
-                            "[{}] {}",
-                            i,
-                            info.headline
-                                .clone()
-                                .unwrap_or_else(|| String::from("No headline"))
-                        );
-                    });
-                    // for (index, info) in latest.info.iter().enumerate() {
-                    //     println!("[{}] {}", index, "");
-                    // }
-                    println!("{:?}", &latest.info[0]);
-                    println!("{}", "");
-                }
+                termlog::printcap(alert);
             } else {
                 println!("Failed to parse: {}", x);
             }
-            // println!("{}", msg.message);
         }
-        // if let Some(ref awid) = msg.awips_id {
-        //     if let Some(id) = NWSProduct::from_str(&awid[..3]) {
-        //         println!("AWIPS: {}; Product: {}", awid, id.description());
-        //         if id == NWSProduct::HML {
-        //             println!("{}", msg.message);
-        //         }
-        //     } else {
-        //         println!("ttaaii: {};", msg.ttaaii);
-        //         if &msg.ttaaii[..4] == "NTXX" || &msg.ttaaii[..2] == "XO" {
-        //             println!("{}", msg.message);
-        //         }
-        //     }
-        // }
     }
 }
 
