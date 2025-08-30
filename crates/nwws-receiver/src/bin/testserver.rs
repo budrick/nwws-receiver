@@ -9,8 +9,10 @@ use tokio::sync::broadcast;
 async fn main() -> color_eyre::eyre::Result<()> {
     color_eyre::install()?;
     dotenv::dotenv()?;
+
     let conf = config::get();
     let (tx, _) = broadcast::channel(32);
+
     tokio::try_join! {
         nwwsoi::start(conf.clone(), tx.clone()),
         startprintloop(tx.subscribe()),
