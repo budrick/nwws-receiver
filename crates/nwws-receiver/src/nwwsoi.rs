@@ -1,8 +1,10 @@
+use crate::cap::extractxml;
 use crate::config::Config;
 use chrono::DateTime;
 use chrono::Utc;
 use futures::StreamExt;
 use nwws_oi::StreamEvent;
+use std::str::FromStr;
 
 pub async fn start(
     conf: Config,
@@ -26,6 +28,31 @@ async fn mainloop(
                 let _ttaa = &message.ttaaii[..4];
                 let _now: DateTime<Utc> = Utc::now();
                 sender.send(message).unwrap();
+            }
+        }
+    }
+}
+
+pub async fn startcap(
+    receiver: tokio::sync::broadcast::Receiver<nwws_oi::Message>,
+    sender: tokio::sync::broadcast::Sender<oasiscap::v1dot2::Alert>,
+) -> color_eyre::eyre::Result<()> {
+    // let stream = nwws_oi::Stream::new(conf.nwwsoi);
+    tokio::spawn(caploop(receiver, sender));
+    Ok(())
+}
+async fn caploop(
+    mut receiver: tokio::sync::broadcast::Receiver<nwws_oi::Message>,
+    sender: tokio::sync::broadcast::Sender<oasiscap::v1dot2::Alert>,
+) {
+    // Process messages when we get them.
+    while let Ok(msg) = receiver.recv().await {
+        if &msg.ttaaii[..1] == "X" {
+            let x = extractxml(&msg.message);
+            if let Ok(alert) = oasiscap::Alert::from_str(x) {
+                if sender.send(alert.into_latest()).is_ok() {}
+            } else {
+                println!("Failed to parse: {}", x);
             }
         }
     }

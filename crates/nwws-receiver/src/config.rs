@@ -1,8 +1,24 @@
 use nwws_oi::Config as NwwsOiConfig;
 
 #[derive(Debug, Clone, PartialEq)]
+pub struct SseConfig {
+    addr: String,
+    port: u16,
+}
+
+impl Default for SseConfig {
+    fn default() -> Self {
+        Self {
+            addr: String::from("127.0.0.1"),
+            port: 13579,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
 pub struct Config {
     pub nwwsoi: NwwsOiConfig,
+    pub sse: SseConfig,
 }
 
 pub fn get() -> Config {
@@ -15,5 +31,8 @@ pub fn get() -> Config {
         resource: format!("uuid/{}", uuid::Uuid::new_v4()),
         channel: nwws_oi::Channel::Default,
     };
-    Config { nwwsoi: nc }
+    Config {
+        nwwsoi: nc,
+        sse: SseConfig::default(),
+    }
 }

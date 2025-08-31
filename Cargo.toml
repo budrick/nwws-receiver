@@ -21,7 +21,7 @@ axum = "0.8.4"
 axum-extra = { version = "0.10.1", features = ["typed-header"] }
 futures-util = { version = "0.3.31", default-features = false, features = ["sink", "std"] }
 tower-http = { version = "0.6.6", features = ["fs", "trace"] }
-tokio-stream = "0.1.17"
+tokio-stream = { version = "0.1.17",  features = ["sync"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 headers = "0.4"
