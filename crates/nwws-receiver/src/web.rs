@@ -8,7 +8,6 @@ use futures_util::stream::{self, Stream};
 use std::{convert::Infallible, path::PathBuf, time::Duration};
 use tokio_stream::StreamExt as _;
 use tower_http::{services::ServeDir, trace::TraceLayer};
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 pub async fn start(
     mut rx: tokio::sync::broadcast::Receiver<nwws_oi::Message>,
@@ -19,7 +18,7 @@ pub async fn start(
     let app = app();
 
     // run it
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:13579")
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
         .await
         .unwrap();
     tracing::debug!("listening on {}", listener.local_addr().unwrap());
