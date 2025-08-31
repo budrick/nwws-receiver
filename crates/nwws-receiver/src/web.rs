@@ -15,6 +15,8 @@ use tokio::sync::Mutex;
 use tokio_stream::wrappers::BroadcastStream;
 use tower_http::{services::ServeDir, trace::TraceLayer};
 
+use crate::types::SharedCapSender;
+
 pub async fn startcap(
     tx_cap: Arc<Mutex<tokio::sync::broadcast::Sender<oasiscap::v1dot2::Alert>>>,
 ) -> color_eyre::eyre::Result<()> {
@@ -22,7 +24,7 @@ pub async fn startcap(
     let assets_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("assets");
     let static_files_service = ServeDir::new(assets_dir).append_index_html_on_directories(true);
 
-    // build our application with a route
+    // builcapur application with a route
     let app = Router::new()
         .fallback_service(static_files_service)
         .route("/sse", get(sse_handler))
@@ -41,7 +43,7 @@ pub async fn startcap(
 }
 
 async fn sse_handler(
-    State(sender): State<Arc<Mutex<tokio::sync::broadcast::Sender<oasiscap::v1dot2::Alert>>>>,
+    State(sender): State<SharedCapSender>,
     TypedHeader(user_agent): TypedHeader<headers::UserAgent>,
 ) -> Sse<impl Stream<Item = Result<Event, Error>>> {
     println!("`{}` connected", user_agent.as_str());

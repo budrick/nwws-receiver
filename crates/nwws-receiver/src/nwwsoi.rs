@@ -1,5 +1,6 @@
-use crate::cap::extractxml;
 use crate::config::Config;
+use crate::types::{CapSender, NwwsReceiver};
+use crate::util::extractxml;
 use chrono::DateTime;
 use chrono::Utc;
 use futures::StreamExt;
@@ -33,18 +34,12 @@ async fn mainloop(
     }
 }
 
-pub async fn startcap(
-    receiver: tokio::sync::broadcast::Receiver<nwws_oi::Message>,
-    sender: tokio::sync::broadcast::Sender<oasiscap::v1dot2::Alert>,
-) -> color_eyre::eyre::Result<()> {
+pub async fn startcap(receiver: NwwsReceiver, sender: CapSender) -> color_eyre::eyre::Result<()> {
     // let stream = nwws_oi::Stream::new(conf.nwwsoi);
     tokio::spawn(caploop(receiver, sender));
     Ok(())
 }
-async fn caploop(
-    mut receiver: tokio::sync::broadcast::Receiver<nwws_oi::Message>,
-    sender: tokio::sync::broadcast::Sender<oasiscap::v1dot2::Alert>,
-) {
+async fn caploop(mut receiver: NwwsReceiver, sender: CapSender) {
     // Process messages when we get them.
     while let Ok(msg) = receiver.recv().await {
         if &msg.ttaaii[..1] == "X" {

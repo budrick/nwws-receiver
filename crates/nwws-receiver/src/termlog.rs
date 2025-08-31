@@ -1,16 +1,18 @@
+use oasiscap::v1dot2::Alert;
 use oasiscap::v1dot2::Status;
-use oasiscap::Alert;
 use owo_colors::OwoColorize;
 
-pub fn printcap(alert: Alert) {
-    let latest = alert.into_latest();
-    if latest.status == Status::Actual {
+use crate::types::CapReceiver;
+
+fn printcap(alert: Alert) {
+    // let latest = alert.into_latest();
+    if alert.status == Status::Actual {
         println!(
             "{} sent by {}",
-            latest.identifier.green(),
-            latest.sender.yellow()
+            alert.identifier.green(),
+            alert.sender.yellow()
         );
-        latest.info.iter().enumerate().for_each(|(i, info)| {
+        alert.info.iter().enumerate().for_each(|(i, info)| {
             println!(
                 "[{}] {}",
                 i.green(),
@@ -22,8 +24,15 @@ pub fn printcap(alert: Alert) {
         println!(
             "{}{}",
             "https://api.weather.gov/alerts/".blue().underline(),
-            latest.identifier.blue().underline()
+            alert.identifier.blue().underline()
         );
         println!();
     }
+}
+
+pub async fn startcap(mut rx: CapReceiver) -> color_eyre::eyre::Result<()> {
+    while let Ok(alert) = rx.recv().await {
+        printcap(alert);
+    }
+    Ok(())
 }
