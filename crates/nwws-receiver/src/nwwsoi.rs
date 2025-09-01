@@ -1,4 +1,5 @@
 use crate::config::Config;
+use crate::message::Message;
 use crate::types::{CapSender, NwwsReceiver};
 use crate::util::extractxml;
 use chrono::DateTime;
@@ -45,7 +46,10 @@ async fn caploop(mut receiver: NwwsReceiver, sender: CapSender) {
         if &msg.ttaaii[..1] == "X" {
             let x = extractxml(&msg.message);
             if let Ok(alert) = oasiscap::Alert::from_str(x) {
-                if sender.send(alert.into_latest()).is_ok() {}
+                if sender
+                    .send(Message::Alert(Box::new(alert.into_latest())))
+                    .is_ok()
+                {}
             } else {
                 println!("Failed to parse: {}", x);
             }

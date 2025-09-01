@@ -1,0 +1,12 @@
+@font-face {
+    font-family: 'modesevenregular';
+    src: url('mode7gx3-webfont.woff2') format('woff2'),
+         url('mode7gx3-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+:root {
+    --pico-font-family: modesevenregular, monospace, sans-serif;
+}

@@ -1,10 +1,14 @@
+use crate::message::Message;
 use std::sync::Arc;
-use tokio::sync::Mutex;
+use tokio::sync::{broadcast::Receiver, broadcast::Sender, Mutex};
 
-pub type NwwsSender = tokio::sync::broadcast::Sender<nwws_oi::Message>;
-pub type NwwsReceiver = tokio::sync::broadcast::Receiver<nwws_oi::Message>;
+pub type NwwsSender = Sender<nwws_oi::Message>;
+pub type NwwsReceiver = Receiver<nwws_oi::Message>;
 
-pub type CapSender = tokio::sync::broadcast::Sender<oasiscap::v1dot2::Alert>;
-pub type CapReceiver = tokio::sync::broadcast::Receiver<oasiscap::v1dot2::Alert>;
+pub type CapSender = Sender<Message>;
+pub type CapReceiver = Receiver<Message>;
+
+// pub type MessageSender = Sender<Message>;
+// pub type MessageReceiver = Receiver<Message>;
 
 pub type SharedCapSender = Arc<Mutex<CapSender>>;

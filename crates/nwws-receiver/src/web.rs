@@ -1,3 +1,4 @@
+use crate::message::Message;
 use axum::extract::State;
 use axum::Error;
 use axum::{
@@ -10,16 +11,13 @@ use futures_util::Stream;
 use tokio::time::Duration;
 use tokio_stream::StreamExt;
 // use futures_util::stream::{self, Stream};
-use std::{path::PathBuf, sync::Arc};
-use tokio::sync::Mutex;
+use std::path::PathBuf;
 use tokio_stream::wrappers::BroadcastStream;
 use tower_http::{services::ServeDir, trace::TraceLayer};
 
 use crate::types::SharedCapSender;
 
-pub async fn startcap(
-    tx_cap: Arc<Mutex<tokio::sync::broadcast::Sender<oasiscap::v1dot2::Alert>>>,
-) -> color_eyre::eyre::Result<()> {
+pub async fn startcap(tx_cap: SharedCapSender) -> color_eyre::eyre::Result<()> {
     // build our application
     let assets_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("assets");
     let static_files_service = ServeDir::new(assets_dir).append_index_html_on_directories(true);
@@ -51,10 +49,19 @@ async fn sse_handler(
     let guard = sender.lock().await;
     let rx_message = (*guard).subscribe();
     let stream = BroadcastStream::new(rx_message);
+    let dstream = tokio_stream::iter(vec![Ok(Message::Dummy)]);
+    let cstream = stream.merge(dstream);
 
-    let stream = stream.map(move |item| {
+    let stream = cstream.map(move |item| {
         // println!("{:?}", item);
-        Event::default().json_data(item.unwrap())
+        let a = item.unwrap();
+        let r = match a {
+            Message::Alert(alert) => Event::default().data(alert.to_string()),
+            _ => Event::default().data("Messages may take a while to arrive..."),
+        };
+        Ok(r)
+        // Event::default().json_data(aa)
+        // Event::default().json_data(item.unwrap())
     });
     Sse::new(stream).keep_alive(
         axum::response::sse::KeepAlive::new()

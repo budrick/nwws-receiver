@@ -1,3 +1,4 @@
+use crate::message::Message;
 use oasiscap::v1dot2::Alert;
 use oasiscap::v1dot2::Status;
 use owo_colors::OwoColorize;
@@ -31,8 +32,10 @@ fn printcap(alert: Alert) {
 }
 
 pub async fn startcap(mut rx: CapReceiver) -> color_eyre::eyre::Result<()> {
-    while let Ok(alert) = rx.recv().await {
-        printcap(alert);
+    while let Ok(message) = rx.recv().await {
+        if let Message::Alert(alert) = message {
+            printcap(*alert);
+        }
     }
     Ok(())
 }

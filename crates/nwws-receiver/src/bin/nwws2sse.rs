@@ -1,3 +1,4 @@
+use nwws_receiver::message::Message;
 use nwws_receiver::types::SharedCapSender;
 use nwws_receiver::{config, nwwsoi, termlog, web};
 use std::sync::Arc;
