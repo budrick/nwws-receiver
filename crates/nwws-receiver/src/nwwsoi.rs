@@ -1,58 +1,42 @@
 use crate::config::Config;
 use crate::message::Message;
-use crate::types::{CapSender, NwwsReceiver};
+use crate::types::CapSender;
 use crate::util::extractxml;
-use chrono::DateTime;
-use chrono::Utc;
-use futures::StreamExt;
+use color_eyre::eyre::Result;
 use nwws_oi::StreamEvent;
 use std::str::FromStr;
+use tokio_stream::StreamExt;
 
-pub async fn start(
-    conf: Config,
-    sender: tokio::sync::broadcast::Sender<nwws_oi::Message>,
-) -> color_eyre::eyre::Result<()> {
+pub async fn startstream(conf: Config, tx: CapSender) -> Result<()> {
     let stream = nwws_oi::Stream::new(conf.nwwsoi);
-    tokio::spawn(mainloop(stream, sender));
+    tokio::spawn(streamloop(stream, tx));
+
     Ok(())
 }
 
-async fn mainloop(
-    mut stream: nwws_oi::Stream,
-    sender: tokio::sync::broadcast::Sender<nwws_oi::Message>,
-) {
-    // Process messages when we get them.
-    while let Some(event) = stream.next().await {
-        match event {
-            StreamEvent::ConnectionState(_state) => {}
-            StreamEvent::Error(error) => log::error!("error: {}", error),
-            StreamEvent::Message(message) => {
-                let _ttaa = &message.ttaaii[..4];
-                let _now: DateTime<Utc> = Utc::now();
-                sender.send(message).unwrap();
+async fn streamloop(stream: nwws_oi::Stream, tx: CapSender) {
+    // async fn streamloop(stream: nwws_oi::Stream) {
+    let mut stream = StreamExt::filter_map(stream, |event| match event {
+        StreamEvent::Message(message) => {
+            if &message.ttaaii[..1] == "X" {
+                let x = extractxml(&message.message);
+                if let Ok(alert) = oasiscap::Alert::from_str(x) {
+                    Some(Message::from(alert.into_latest()))
+                } else {
+                    println!("Failed to parse: {}", x);
+                    None
+                }
+            } else {
+                None
             }
         }
-    }
-}
+        _ => None,
+    });
 
-pub async fn startcap(receiver: NwwsReceiver, sender: CapSender) -> color_eyre::eyre::Result<()> {
-    // let stream = nwws_oi::Stream::new(conf.nwwsoi);
-    tokio::spawn(caploop(receiver, sender));
-    Ok(())
-}
-async fn caploop(mut receiver: NwwsReceiver, sender: CapSender) {
-    // Process messages when we get them.
-    while let Ok(msg) = receiver.recv().await {
-        if &msg.ttaaii[..1] == "X" {
-            let x = extractxml(&msg.message);
-            if let Ok(alert) = oasiscap::Alert::from_str(x) {
-                if sender
-                    .send(Message::Alert(Box::new(alert.into_latest())))
-                    .is_ok()
-                {}
-            } else {
-                println!("Failed to parse: {}", x);
-            }
+    while let Some(message) = stream.next().await {
+        // Ignoring the result is an antipattern, but go with it for now.
+        if tx.send(Box::new(message)).is_err() {
+            println!("nwwsoi: Error broadcasting");
         }
     }
 }

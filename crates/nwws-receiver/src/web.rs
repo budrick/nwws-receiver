@@ -22,7 +22,7 @@ pub async fn startcap(tx_cap: SharedCapSender) -> color_eyre::eyre::Result<()> {
     let assets_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("assets");
     let static_files_service = ServeDir::new(assets_dir).append_index_html_on_directories(true);
 
-    // builcapur application with a route
+    // build application with a route
     let app = Router::new()
         .fallback_service(static_files_service)
         .route("/sse", get(sse_handler))
@@ -49,16 +49,14 @@ async fn sse_handler(
     let guard = sender.lock().await;
     let rx_message = (*guard).subscribe();
     let stream = BroadcastStream::new(rx_message);
-    let dstream = tokio_stream::iter(vec![Ok(Message::Dummy)]);
+    let dstream = tokio_stream::iter(vec![Ok(Box::new(Message::Dummy))]);
     let cstream = stream.merge(dstream);
 
     let stream = cstream.map(move |item| {
         // println!("{:?}", item);
         let a = item.unwrap();
-        let r = match a {
-            Message::Alert(alert) => {
-                return Event::default().json_data(crate::message::Alert::from_capalert(*alert))
-            }
+        let r = match *a {
+            Message::Alert(alert) => return Event::default().json_data(alert),
             _ => Event::default().data("Messages may take a while to arrive..."),
         };
         Ok(r)

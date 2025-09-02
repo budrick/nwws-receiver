@@ -33,8 +33,8 @@ fn printcap(alert: Alert) {
 
 pub async fn startcap(mut rx: CapReceiver) -> color_eyre::eyre::Result<()> {
     while let Ok(message) = rx.recv().await {
-        if let Message::Alert(alert) = message {
-            printcap(*alert);
+        if let Message::Alert(alert) = *message {
+            printcap((alert).cap);
         }
     }
     Ok(())

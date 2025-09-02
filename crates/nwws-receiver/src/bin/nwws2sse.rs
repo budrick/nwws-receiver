@@ -1,4 +1,3 @@
-use nwws_receiver::message::Message;
 use nwws_receiver::types::SharedCapSender;
 use nwws_receiver::{config, nwwsoi, termlog, web};
 use std::sync::Arc;
@@ -24,10 +23,10 @@ async fn main() -> color_eyre::eyre::Result<()> {
     // Step 3: In CAP, out CAP to web subscribers
 
     tokio::try_join! {
-        nwwsoi::start(conf.clone(), tx.clone()), // Get NWWS messages, send to CAP extractor
+        nwwsoi::startstream(conf.clone(), tx.clone()), // Get NWWS messages, send to CAP extractor
         web::startcap(tx_cap), // Receive CAP from extractor
         termlog::startcap(captx.subscribe()), // Receive CAP from extractor
-        nwwsoi::startcap(tx.subscribe(), captx), // Receive NWWS messages, emit CAP. Here because move restrictions.
+        // nwwsoi::startcap(tx.subscribe(), captx), // Receive NWWS messages, emit CAP. Here because move restrictions.
     }?;
 
     signal::ctrl_c().await.expect("Couldn't listen to Ctrl-C");
