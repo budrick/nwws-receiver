@@ -56,7 +56,9 @@ async fn sse_handler(
         // println!("{:?}", item);
         let a = item.unwrap();
         let r = match a {
-            Message::Alert(alert) => Event::default().data(alert.to_string()),
+            Message::Alert(alert) => {
+                return Event::default().json_data(crate::message::Alert::from_capalert(*alert))
+            }
             _ => Event::default().data("Messages may take a while to arrive..."),
         };
         Ok(r)

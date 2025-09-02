@@ -12,3 +12,5 @@ pub type CapReceiver = Receiver<Message>;
 // pub type MessageReceiver = Receiver<Message>;
 
 pub type SharedCapSender = Arc<Mutex<CapSender>>;
+
+pub type CapAlert = oasiscap::v1dot2::Alert;
