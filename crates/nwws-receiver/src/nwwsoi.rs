@@ -35,8 +35,8 @@ async fn streamloop(stream: nwws_oi::Stream, tx: CapSender) {
 
     while let Some(message) = stream.next().await {
         // Ignoring the result is an antipattern, but go with it for now.
-        if tx.send(Box::new(message)).is_err() {
-            println!("nwwsoi: Error broadcasting");
+        if let Err(e) = tx.send(Box::new(message)) {
+            println!("nwwsoi: Error broadcasting, {}", e);
         }
     }
 }

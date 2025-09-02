@@ -17,7 +17,10 @@ use tower_http::{services::ServeDir, trace::TraceLayer};
 
 use crate::types::SharedCapSender;
 
-pub async fn startcap(tx_cap: SharedCapSender) -> color_eyre::eyre::Result<()> {
+pub async fn startcap(
+    config: crate::config::Config,
+    tx_cap: SharedCapSender,
+) -> color_eyre::eyre::Result<()> {
     // build our application
     let assets_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("assets");
     let static_files_service = ServeDir::new(assets_dir).append_index_html_on_directories(true);
@@ -30,7 +33,7 @@ pub async fn startcap(tx_cap: SharedCapSender) -> color_eyre::eyre::Result<()> {
         .with_state(tx_cap);
 
     // run it
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:13579")
+    let listener = tokio::net::TcpListener::bind(config.sse.addr)
         .await
         .unwrap();
 

@@ -2,15 +2,13 @@ use nwws_oi::Config as NwwsOiConfig;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SseConfig {
-    addr: String,
-    port: u16,
+    pub addr: String,
 }
 
 impl Default for SseConfig {
     fn default() -> Self {
         Self {
-            addr: String::from("127.0.0.1"),
-            port: 13579,
+            addr: String::from("127.0.0.1:13579"),
         }
     }
 }
