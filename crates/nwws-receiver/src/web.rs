@@ -56,15 +56,12 @@ async fn sse_handler(
     let cstream = stream.merge(dstream);
 
     let stream = cstream.map(move |item| {
-        // println!("{:?}", item);
         let a = item.unwrap();
         let r = match *a {
             Message::Alert(alert) => return Event::default().json_data(alert),
             _ => Event::default().data("Messages may take a while to arrive..."),
         };
         Ok(r)
-        // Event::default().json_data(aa)
-        // Event::default().json_data(item.unwrap())
     });
     Sse::new(stream).keep_alive(
         axum::response::sse::KeepAlive::new()

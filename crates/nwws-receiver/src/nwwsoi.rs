@@ -15,7 +15,6 @@ pub async fn startstream(conf: Config, tx: CapSender) -> Result<()> {
 }
 
 async fn streamloop(stream: nwws_oi::Stream, tx: CapSender) {
-    // async fn streamloop(stream: nwws_oi::Stream) {
     let mut stream = StreamExt::filter_map(stream, |event| match event {
         StreamEvent::Message(message) => {
             if &message.ttaaii[..1] == "X" {
@@ -34,7 +33,6 @@ async fn streamloop(stream: nwws_oi::Stream, tx: CapSender) {
     });
 
     while let Some(message) = stream.next().await {
-        // Ignoring the result is an antipattern, but go with it for now.
         if let Err(e) = tx.send(Box::new(message)) {
             println!("nwwsoi: Error broadcasting, {}", e);
         }

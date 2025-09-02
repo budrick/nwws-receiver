@@ -17,14 +17,10 @@ async fn main() -> color_eyre::eyre::Result<()> {
     let (tx, _) = broadcast::channel(32);
     let tx_cap: SharedCapSender = Arc::new(Mutex::new(tx.clone()));
 
-    // Step 1: In XMPP, out NWWS message
-    // Step 2: In NWWS message, out decoded CAP
-    // Step 3: In CAP, out CAP to web subscribers
-
     tokio::try_join! {
-        nwwsoi::startstream(conf.clone(), tx.clone()), // Get NWWS messages, send to CAP extractor
-        web::startcap(conf.clone(), tx_cap), // Receive CAP from extractor
-        termlog::startcap(tx.subscribe()), // Receive CAP from extractor
+        nwwsoi::startstream(conf.clone(), tx.clone()), // Get NWWS messages, send successful CAP decodes to broadcast channel
+        web::startcap(conf.clone(), tx_cap), // Receive CAP messages and broadcast to SSE clients
+        termlog::startcap(tx.subscribe()), // Receive CAP messages and print
         // nwwsoi::startcap(tx.subscribe(), captx), // Receive NWWS messages, emit CAP. Here because move restrictions.
     }?;
 
