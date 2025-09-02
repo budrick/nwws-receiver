@@ -11,6 +11,10 @@
     --pico-font-family: modesevenregular, monospace, sans-serif;
 }
 
+.ceefox-msglist {
+    min-height: 80dvh;
+}
+
 /*
 CRT effect: https://aleclownes.com/2017/02/01/crt-display.html
 */
