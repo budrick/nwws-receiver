@@ -57,8 +57,19 @@ async fn sse_handler(
     let stream = cstream.map(move |item| {
         let a = item.unwrap();
         let r = match *a {
-            Message::Alert(alert) => return Event::default().json_data(alert),
-            _ => Event::default().data("Messages may take a while to arrive..."),
+            Message::Alert(alert) =>  {
+                let tj = *alert;
+                let st = serde_json::to_string(&tj);
+                if let Ok(json) = st {
+                    let replaced = json.replace("{urn:oasis:names:tc:emergency:cap:1.2;}cap:", "");
+                    Event::default().event("alert").data(replaced)
+                } else {
+                    Event::default().event("alerterror").data("JSON failed")
+                }
+                // return Event::default().event("alert").data(st);
+                // return Event::default().event("alert").json_data(alert);
+            }
+            _ => Event::default().event("meta").data("Alerts will show up here as they are issued. If things are quiet, this page will be quiet."),
         };
         Ok(r)
     });

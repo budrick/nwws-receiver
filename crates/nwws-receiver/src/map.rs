@@ -1,0 +1,38 @@
+use serde::{Deserialize, Serialize};
+
+/// A CAP v1.2 key-value map.
+pub type Map = oasiscap::map::Map<Entry>;
+
+/// A CAP v1.2 map entry
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+pub struct Entry {
+    value_name: String,
+    value: String,
+}
+
+impl From<(String, String)> for Entry {
+    fn from((value_name, value): (String, String)) -> Self {
+        Self { value_name, value }
+    }
+}
+
+impl From<Entry> for (String, String) {
+    fn from(e: Entry) -> Self {
+        (e.value_name, e.value)
+    }
+}
+
+impl oasiscap::map::Entry for Entry {
+    fn value_name(&self) -> &str {
+        &self.value_name
+    }
+
+    fn value(&self) -> &str {
+        &self.value
+    }
+
+    fn set_value(&mut self, mut new_value: String) -> String {
+        std::mem::swap(&mut new_value, &mut self.value);
+        new_value
+    }
+}

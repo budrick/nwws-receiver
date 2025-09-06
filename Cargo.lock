@@ -1493,6 +1493,7 @@ dependencies = [
  "owo-colors",
  "rusqlite",
  "serde",
+ "serde_json",
  "tokio",
  "tokio-stream",
  "tower-http",
