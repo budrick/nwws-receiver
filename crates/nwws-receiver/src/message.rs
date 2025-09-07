@@ -129,6 +129,7 @@ impl From<oasiscap::v1dot2::Info> for Info {
 pub struct Alert {
     pub id: oasiscap::id::Id,
     pub headline: Option<String>,
+    pub sent: oasiscap::DateTime,
     pub info: Vec<Info>,
     pub status: oasiscap::v1dot2::Status,
     pub sender: oasiscap::id::Id, // pub cap: CapAlert,
@@ -140,7 +141,8 @@ impl From<CapAlert> for Alert {
         Self {
             id: value.identifier,
             headline: value.info[0].headline.clone(),
-            info: info,
+            info,
+            sent: value.sent,
             status: value.status,
             sender: value.sender,
         }
