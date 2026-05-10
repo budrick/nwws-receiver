@@ -30,7 +30,8 @@ eventSource.addEventListener('alert', function(event) {
     let alem = createAlertElement(data)
     console.log(alem)
     li.innerHTML = alem
-    list.appendChild(li)
+    // list.appendChild(li)
+    list.insertBefore(li, list.firstChild)
 
 })
 
